@@ -1,0 +1,8 @@
+TARGET1:
+program can get the pw from the middleware 
+middle ware get the password from the PIC32 through USB
+
+TARGET2:
+
+middleware manage system can read a file (or user input), and this file can be encrypted by PIC32 and pass the encrypted file back.
+Also implement in the reverse way
