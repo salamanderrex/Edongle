@@ -1,0 +1,76 @@
+===================================================================================
+==========  this file was created by UMJI_VE373 PROJECT E-DONGLE	===========
+==========	copyright belongs to UMJI_VE373 PROJECT E-DONGLE	===========
+==========		Last modified date: 2014_8_1			===========
+===================================================================================
+
+NOTICE: 
+scenario 1 and 2 are under the message tunnal, which control by the OS core and operate on local 
+scenario 1:
+
+A normal program(process) ask for the passwd and user name
+
+the program will send to the middleware 
+value:REQUEST_INFO=1
+pid: the pid (process id)of current process
+NOTICE:software_id here is a string type
+{"type":1,"parameters":[{"pid":1234},{"software_id":"testprogram1"},{"user":"user1"},{"extra":""}]}
+
+then middleware will response the info
+RESPONSE_INFO=2
+
+{"type":2,"parameters":[{"pid":1234},{"software_id":"testprogram1"},{"user":"user1"},{"pw":"passwordofuser1"},{"extra":""}]}
+
+scenario2:
+A normal program(process) want to store the username and pw in the PIC32
+
+the program will send to the middleware 
+value:REQUEST_STORE=3
+pid: the pid of current process
+REQUEST_STORE=3
+
+{"type":3,"parameters":[{"pid":1234},{"software_id":"testprogram1"},{"user":"user1"},{"pw":"passworforuser1_IN_testeprogram1"},{"extra":""}]}
+
+then middleware will response the info
+RESPONSE_STORE=4
+extra 1 mean that succeed (in order to keep the format, extra here is string, and 1 is succeed)
+{"type":4,"parameters":[{"pid":1234},{"software_id":"testprogram1"},{"user":"user1"},{"extra":"1"}}]}
+
+----------------------------------------------------------------------------------------
+scenario3:
+NOTICE: 
+scenario 3 and 4 are under the network interface, which using socket to manage 
+
+
+in this case, the program become a broswer, which means it will carry extra info like web_address
+
+the program will send to the middleware 
+value: WEB_REQUEST_INFO=5
+pid: the pid of current process
+
+NOTICE: here the software_id we use "chrome", which means we indeed use the chrome here
+{"type":5,"parameters":[{"software_id":"chrome"},{"user":"user1"},{"web":"http://www.baidu.com"}]}
+
+then middleware will response the info
+
+{"type":7,"parameters":[{"software_id":"chrome"},{"user":"user1"},{"pw":"passwordofuser1"},{"web":"http://www.baidu.com"}]}
+
+
+NOTICE:
+there exist a lazy request, which means that request without username
+IF there are multi user_name pw pair here, just return the first one 
+request like:
+
+{"type":6,"parameters":[{"software_id":"chrome"},{"web":"http://www.baidu.com"}]}
+
+scenario4:
+store the the pw and usr from browser for specific web 
+browser:
+{"type":9,"parameters":[{"software_id":"chrome"},{"user":"user1"},{"pw":"passwordofuser1"},{"web":"http://www.baidu.com"}]}
+
+
+middleware response 
+{"type":4,"parameters":[{"software_id":"chrome"},{"user":"user1"},{"web":"http://www.baidu.com"},{"extra":"1"}}]}
+
+
+
