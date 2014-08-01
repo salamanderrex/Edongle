@@ -14,12 +14,12 @@ the program will send to the middleware
 value:REQUEST_INFO=1
 pid: the pid (process id)of current process
 NOTICE:software_id here is a string type
-{"type":1,"parameters":[{"pid":1234},{"software_id":"testprogram1"},{"user":"user1"},{"extra":""}]}
+{"type":1,"parameters":[{"pid":1234,"software_id":"testprogram1","user":"user1","extra":""}]}
 
 then middleware will response the info
 RESPONSE_INFO=2
 
-{"type":2,"parameters":[{"pid":1234},{"software_id":"testprogram1"},{"user":"user1"},{"pw":"passwordofuser1"},{"extra":""}]}
+{"type":2,"parameters":[{"pid":1234,"software_id":"testprogram1","user":"user1","pw":"passwordofuser1","extra":""}]}
 
 scenario2:
 A normal program(process) want to store the username and pw in the PIC32
@@ -29,12 +29,12 @@ value:REQUEST_STORE=3
 pid: the pid of current process
 REQUEST_STORE=3
 
-{"type":3,"parameters":[{"pid":1234},{"software_id":"testprogram1"},{"user":"user1"},{"pw":"passworforuser1_IN_testeprogram1"},{"extra":""}]}
+{"type":3,"parameters":[{"pid":1234,"software_id":"testprogram1","user":"user1","pw":"passworforuser1_IN_testeprogram1","extra":""}]}
 
 then middleware will response the info
 RESPONSE_STORE=4
 extra 1 mean that succeed (in order to keep the format, extra here is string, and 1 is succeed)
-{"type":4,"parameters":[{"pid":1234},{"software_id":"testprogram1"},{"user":"user1"},{"extra":"1"}}]}
+{"type":4,"parameters":[{"pid":1234,"software_id":"testprogram1","user":"user1","extra":"1"}}]}
 
 ----------------------------------------------------------------------------------------
 scenario3:

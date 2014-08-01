@@ -2,7 +2,8 @@ HEADERS += \
     ../include/msg_types.h \
     ../include/jsonHelper.h \
     ../include/C_R.h \
-    server_console.h
+    server_console.h \
+    msgcom.h
 
 SOURCES += \
     server_multi.cpp

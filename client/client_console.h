@@ -1,5 +1,5 @@
-#ifndef SERVER_CONSOLE_H
-#define SERVER_CONSOLE_H
+#ifndef CLIENT_CONSOLE_H
+#define CLIENT_CONSOLE_H
 
 #include <fstream>
 #include <termios.h>
@@ -10,9 +10,12 @@
 #include <netinet/in.h>
 #include <net/if.h>
 #include <C_R.h>
+#include "msgcom.h"
+
 using namespace std;
 struct termios orig_termios;
 extern vector <info_base *> infos;
+extern jsonhelper Jhelp;
 
 
 void reset_terminal_mode()
@@ -109,17 +112,25 @@ void print_menu(string username)
           "torrent main panel"<<endl<<
            "====================================="<<endl<<
            "hello user : "<< username << endl<<
-           "1. check current info list"<<endl<<
-           "2. exit"<<endl<<
+           "1. check current info list" << endl <<
+           "2. add info to info list" << endl <<
+           "3. request for password" << endl <<
+           "4. store the user and password" << endl <<
+           "5. exit"<<endl<<
            "====================================="<<endl;
 }
 
-void  *pthread_server_console(void *ptr)
+void  *pthread_client_console(void *ptr)
 {
     string username;
     cout << "please login:" << endl;
     cin >> username;
     print_menu(username);
+    struct msgtype buf;
+    int qid;
+    qid=msgget(MSGKEY,IPC_CREAT|0666);
+    buf.mtype=1;
+
 
     while(1)
     {
@@ -144,19 +155,81 @@ void  *pthread_server_console(void *ptr)
             {
                 cout << i << "\t" << infos.at(i)->user << "\t" << infos.at(i)->pw << endl;
             }
-            cout <<  "*************************************" << endl << endl;
+            cout << "*************************************" << endl << endl;
             print_menu(username);
         }
         else if(instruction_id == '2')
         {
+            info_base * info = new info_base;
+            int havePassword;
+            cout << "please give the pid" << endl;
+            cin >> info->pid;
+            cout << "please give the software id" << endl;
+            cin >> info->software_id;
+            cout << "please give the user name" << endl;
+            cin >> info->user;
+            cout << "do you know the password? (0 for unknown, 1 for known)" << endl;
+            cin >> havePassword;
+            if(havePassword == 1)
+            {
+                cout << "please give the password" << endl;
+                cin >> info->pw;
+            }
+            cout <<"thank you!" << endl << endl;
+            infos.push_back(info);
+            print_menu(username);
+        }
+        else if(instruction_id == '3')
+        {
+            int id;
+            cout << "please give the info id" << endl;
+            cin >> id;
+            if(id >= infos.size())
+            {
+                cout << "invalid id" << endl;
+                continue;
+            }
+            strcpy(buf.text, (Jhelp.generate_msg(REQUEST_INFO, infos.at(id))).c_str());
+            msgsnd(qid,&buf,sizeof(buf.text), IPC_NOWAIT|0666);
+            msgrcv(qid,&buf,512,11,MSG_NOERROR);
+            printf("Request received a message from server, type is: %d\, msg is %sn",buf.mtype,buf.text);
+            string tempstring = buf.text;
+            Json::Value jroot;
+            Json::Reader jreader;
+            if(!jreader.parse(tempstring,jroot,false))
+            {
+                perror("json reader");
+                exit(-1);
+            }
+            Json::Value parameters=jroot["parameters"];
+            int j = 0;
+            infos.at(id)->pw = parameters[j]["pw"].asString();
+            print_menu(username);
+        }
+        else if(instruction_id == '4')
+        {
+            int id;
+            cout << "please give the info id" << endl;
+            cin >> id;
+            if(id >= infos.size())
+            {
+                cout << "invalid id" << endl;
+                continue;
+            }
+            strcpy(buf.text, (Jhelp.generate_msg(REQUEST_STORE, infos.at(id))).c_str());
+            msgsnd(qid,&buf,sizeof(buf.text), IPC_NOWAIT|0666);
+            msgrcv(qid,&buf,512,11,MSG_NOERROR);
+            printf("Request received a message from server, type is: %d\, msg is %sn",buf.mtype,buf.text);
+        }
+        else if(instruction_id == '5')
+        {
             break;
         }
         else;
-
     }
 
 
 }
 
 
-#endif // SERVER
+#endif // CLIENT_CONSOLE_H

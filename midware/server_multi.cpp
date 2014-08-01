@@ -17,6 +17,7 @@
 #include "../include/msg_types.h"
 #include "server_console.h"
 #include <fstream>
+#include "msgcom.h"
 #define MAXBUF 1024
 #define MAX_DATABUF 4096
 
@@ -46,16 +47,18 @@ int main(int argc, char** argv)
     infos.push_back(info);
     //*******************************************
 
-    pthread_t id;
-    int ret;
+    pthread_t id, id1;
+    int ret, ret1;
     ret=pthread_create(&id,NULL,pthread_server_console,NULL);
     if(ret!=0){
     printf ("Create pthread error!\n");
     exit (1);
     }
-
-
-
+    ret1=pthread_create(&id1,NULL,pthread_msgcom,NULL);
+    if(ret1!=0){
+    printf ("Create pthread error!\n");
+    exit (1);
+    }
     int i,n,maxi = -1;
     int nready;
     int slisten,sockfd,maxfd=-1,connectfd;
@@ -156,7 +159,7 @@ int main(int argc, char** argv)
                     {
                         client[i].fd = connectfd;
                         client[i].addr = addr;
-                        printf("Yout got a connection from %s.\n",
+                        printf("You've got a connection from %s.\n",
                                inet_ntoa(client[i].addr.sin_addr));
                         break;
                     }
