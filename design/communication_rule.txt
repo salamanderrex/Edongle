@@ -49,11 +49,11 @@ value: WEB_REQUEST_INFO=5
 pid: the pid of current process
 
 NOTICE: here the software_id we use "chrome", which means we indeed use the chrome here
-{"type":5,"parameters":[{"software_id":"chrome"},{"user":"user1"},{"web":"http://www.baidu.com"}]}
+{"type":5,"parameters":[{"software_id":"chrome","user":"user1","web":"http://www.baidu.com"}]}
 
 then middleware will response the info
 
-{"type":7,"parameters":[{"software_id":"chrome"},{"user":"user1"},{"pw":"passwordofuser1"},{"web":"http://www.baidu.com"}]}
+{"type":7,"parameters":[{"software_id":"chrome","user":"user1","pw":"passwordofuser1","web":"http://www.baidu.com"}]}
 
 
 NOTICE:
@@ -61,16 +61,16 @@ there exist a lazy request, which means that request without username
 IF there are multi user_name pw pair here, just return the first one 
 request like:
 
-{"type":6,"parameters":[{"software_id":"chrome"},{"web":"http://www.baidu.com"}]}
+{"type":6,"parameters":[{"software_id":"chrome","web":"http://www.baidu.com"}]}
 
 scenario4:
 store the the pw and usr from browser for specific web 
 browser:
-{"type":9,"parameters":[{"software_id":"chrome"},{"user":"user1"},{"pw":"passwordofuser1"},{"web":"http://www.baidu.com"}]}
+{"type":8,"parameters":[{"software_id":"chrome","user":"user1","pw":"passwordofuser1","web":"http://www.baidu.com"}]}
 
 
 middleware response 
-{"type":4,"parameters":[{"software_id":"chrome"},{"user":"user1"},{"web":"http://www.baidu.com"},{"extra":"1"}}]}
+{"type":9,"parameters":[{"software_id":"chrome","user":"user1","web":"http://www.baidu.com","extra":"1"}}]}
 
 
 

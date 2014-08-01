@@ -2,65 +2,104 @@
 #include "C_R.h"
 #include <iostream>
 #include <string>
+#include "msg_types.h"
 using namespace std;
+
+extern vector <info_base *> infos;
+
 class jsonhelper
 {
 public:
 	Json::FastWriter jwriter;
     Json::Reader jreader;
 
-    string generate_msg(int type, int pid,string software_id, string user, string pw)
+    string generate_msg(int type, info_base * info)
     {
+        string returnstr;
     	Json::Value root;
         Json::Value parameter;
         Json::Value parameters;
+        if(type == WEB_RESPONSE_INFO)
+        {
+            parameter["pid"]=info->pid;
+            parameter["user"] = info->user;
+            parameter["pw"] = info->pw;
+            parameter["software_id"]=info->software_id;
+            parameters.append(parameter);
+        }
+        else if(type == WEB_RESPONSE_STORE)
+        {
+            parameter["pid"]=info->pid;
+            parameter["user"] = info->user;
+            parameter["software_id"]=info->software_id;
+            parameter["extra"] = info->extra;
+            parameters.append(parameter);
+        }
+        else
+        {
+            returnstr = "invalid type";
+        }
 
-
-		parameter["pid"]=pid
-		parameter["user"]=user;
-		parameter["pw"]=pw;
-		parameter["software_id"]=software_id;
-		parameters.append(parameter);
 		root["type"]=type;
 		root["parameters"]=parameters;
+        returnstr= jwriter.write(root);
+        return returnstr;
     }
 
-    string parse_msg(string input_string,info_base & info)
+    string parse_msg(string input_string)
     {
-    	Json::Value root;
-    	
-    	    if(!jreader.parse(instruction,jroot,false))
-                            {
-                                perror("json reader");
-                                exit(-1);
-                            }
-                            int j_request_type=jroot["type"].asInt();
+        Json::Value jroot;
+        int type=0;
+        if(!jreader.parse(input_string,jroot,false))
+        {
+            perror("json reader");
+            exit(-1);
+        }
+        type=jroot["type"].asInt();
+        std::cout<<jroot["type"]<<std::endl;
 
-                                Json::Value parameters=jroot["parameters"];
-                                int i, j;
-                                T_TORRENT *torrent;
-                                for(i = 0; i < torrents.size(); i++)
-                                {
-                                    torrent = torrents.at(i);
-                                    for(j = 0; j < parameters.size(); j++)
-                                    {
-                                        if(torrent->torrent_id == parameters[j]["torrent_id"].asInt()) break;
-                                    }
-                                    if(j != parameters.size()) break;
-                                }
-                                if(i == torrents.size()) printf("invalid torrent id\n");
-                                else
-                                {
-                                    strcpy(res_buf,(c_r_client.generate_response(CLINET_RESPONSE_TYPE.C_C_REQUEST_SHAKE_HAND_REPLY,torrent)).c_str());
-                                    std::cout<<"server response:"<<res_buf<<std::endl;
-                                    int  len = send(sockfd, res_buf, strlen(res_buf) , 0);
-                                    if (len > 0)
-                                        printf("msg:%s send successful锛宼otalbytes: %d锛乗n", res_buf, len);
-                                    else {
-                                        printf("msg:'%s  failed!\n", res_buf);
-                                    }
-                                }
-                            }
+        Json::Value parameters=jroot["parameters"];
+        int j = 0;
+        if(type == WEB_REQUEST_INFO)
+        {
+            int i;
+            for(i = 0; i < infos.size(); i++)
+            {
+                if((infos.at(i))->software_id == parameters[j]["software_id"].asString() && (infos.at(i))->web == parameters[j]["web"].asString() && (infos.at(i))->user == parameters[j]["user"].asString()) break;
+            }
+            if(i == infos.size()) return "fail";
+            else return generate_msg(WEB_RESPONSE_INFO, infos.at(i));
+        }
+
+        else if(type == WEB_LAZY_REQUEST_INFO)
+        {
+            int i;
+            for(i = 0; i < infos.size(); i++)
+            {
+                if((infos.at(i))->software_id == parameters[j]["software_id"].asString() && (infos.at(i))->web == parameters[j]["web"].asString()) break;
+            }
+            if(i == infos.size()) return "fail";
+            else return generate_msg(WEB_RESPONSE_INFO, infos.at(i));
+        }
+
+        else if(type == WEB_REQUEST_STORE)
+        {
+            info_base * info = new info_base;
+            info->software_id = parameters[j]["software_id"].asString();
+            info->user = parameters[j]["user"].asString();
+            info->pw = parameters[j]["pw"].asString();
+            info->web = parameters[j]["web"].asString();
+            info->extra = "1";
+            infos.push_back(info);
+            return generate_msg(WEB_RESPONSE_STORE, info);
+        }
+
+        else
+        {
+            cout << "invalid type" << endl;
+        }
+    	
+
 
     }
 
