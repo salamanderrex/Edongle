@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html" />
+    <meta name="author" content="blog.anchen8.net" />
+ 
+    <title>Untitled 2</title>
+ 
+</head>
+ 
+<body>
+    <p id="demo"></p>
+<input id="msg" type="text">
+<button id="connect" onclick="connect();">Connect</button>
+<button id="send" onclick="send();">Send</button>
+<button id="close" onclick="close();">Close</button>
+ 
+</body>
+ 
+
+
+    <script>
+var websocket;
+function connect(){
+    try{
+           var wsServer = 'ws://localhost:4567/';
+
+ websocket = new WebSocket(wsServer);
+    }catch(e){
+        alert('error');
+        return;
+    }
+
+
+websocket.binaryType = "arraybuffer";
+
+websocket.onopen = onOpen;
+
+websocket.onclose = onClose;
+
+websocket.onmessage = onMessage;
+
+websocket.onerror = onError;
+ 
+}
+function onOpen(){
+    alert('connect success!')
+}
+function onError(){
+    alert('connect error')
+}
+
+
+function onMessage(evt) {
+
+ var json = JSON.parse(evt.data);
+alert("server says:"+json.key1);
+x=document.getElementById("demo");
+x.innerHTML=evt.data;
+ //commands[jreson.event](json.data);
+
+}
+ 
+function onClose(){
+    alert('connect close')
+}
+function send(){
+    websocket.send('{"key1":"value"}');
+}
+function close(){
+    websocket.close();
+}
+</script>
+</html>
