@@ -323,7 +323,9 @@ void *handleClient(void *args) {
 					ERROR_NOT_IMPL, n);
 			pthread_exit((void *) EXIT_FAILURE);
 		}
+		//print receive data from client
 
+		printf("\n---------client send: %s;",buffer);
 		string_length += buffer_length;
 
 		char *tmp = realloc(n->string, string_length);
@@ -387,9 +389,47 @@ void *handleClient(void *args) {
 		if (n->headers->protocol == CHAT) {
 			list_multicast(l, n);
 		} else if (n->headers->protocol == ECHO) {
+			printf("\n==== I am here to ECHO\n");
 			list_multicast_one(l, n, n->message);
 		} else {
-			list_multicast_one(l, n, n->message);
+
+			printf("======client sends me %s",n->message->msg);
+			printf("\n====I am here rto RESPONSE\n");
+			//=================================================
+
+				char * s_m="can you hear me ?";
+				ws_message *mm = message_new();
+				mm->len = strlen(s_m);
+
+				char *ttemp = malloc( sizeof(char)*(mm->len+1) );
+				if (ttemp == NULL) {
+					raise(SIGINT);		
+					break;
+				}
+				memset(ttemp, '\0', (mm->len+1));
+				memcpy(ttemp, s_m, mm->len);
+				mm->msg = ttemp;
+				ttemp = NULL;
+				ws_connection_close status;
+				if ( (status = encodeMessage(mm)) != CONTINUE) {
+					message_free(mm);
+					free(mm);
+					raise(SIGINT);
+					break;;
+				}
+				printf("%s",mm->msg);
+				list_multicast_one(l, n, mm);
+				message_free(mm);
+				free(mm);
+				printf("--------send finish\n");
+		
+		//	ws_message * mm=message_new();
+		//	mm->len=strlen(s_m);
+		//	char ttemp= malloc (sizeof(char)* mm->len
+		//	encodeMessage(n->message);
+			//list_multicast_one(l, n,n->message);
+
+			//==================================================
 		}
 		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
