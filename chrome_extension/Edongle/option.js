@@ -3,6 +3,7 @@ var runtimeOrExtension = chrome.runtime && chrome.runtime.sendMessage ?
                          'runtime' : 'extension';
  var websocket;
  connect_webSocket();
+ console.log("in the option!!!!!!!!!!!!");
 $( document ).ready(function() {
 
 	
@@ -17,7 +18,8 @@ $( document ).ready(function() {
 			// Show wait.gif
 			$("#wait-gif").css("display", "inline");
 			send();
-			//$.post(login_url, { eid: $("#username")[0].value, pw: $("#password")[0].value})
+			var login_url="fadsfdsfds";
+		$.post(login_url, { eid: $("#username")[0].value, pw: $("#password")[0].value})
 			.done(function(data) {
 				if (data.indexOf('action="http://sakai.umji.sjtu.edu.cn/portal/relogin"') == -1){
 					// Success, save it to local storage
@@ -64,6 +66,7 @@ websocket.onmessage = onMessage;
 websocket.onerror = onError;
  
 }
+
 function onOpen(){
   console.log("connect the web socket server succeed");
 }
@@ -76,7 +79,11 @@ function onMessage(evt) {
 
 //var json = JSON.parse(evt.data);
 console.log("onMessage handler"+evt.data);
+
+
 receive_msg=evt.data;
+$("#wait-gif").css("display", "none");
+$("#success")[0].innerHTML = "Succeed! You can close this page now."
 
 
 	//window.open('http://sakai.umji.sjtu.edu.cn/');
@@ -88,7 +95,15 @@ function onClose(){
     has_login=0;
 }
 function send(){
-    websocket.send('jiehaoser');
+//{"type":8,"parameters":[{"software_id":"chrome","user":"user1","pw":"passwordofuser1","web":"http://www.baidu.com"}]}
+	var user=$("#username")[0].value;
+	var pw=$("#password")[0].value;
+	var web=$("#web")[0].value;
+	
+	var out="{\"type\":8,\"parameters\":[{\"software_id\":\"chrome\",\"user\":\""+user+"\",\"pw\":\""+pw+"\",\"web\":\""+web+"\"}]}";
+
+	console.log(out);
+    websocket.send(out);
 }
 function close(){
     websocket.close();

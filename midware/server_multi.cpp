@@ -421,6 +421,7 @@ void *handleClient(void *args) {
                     raise(SIGINT);
                     break;;
                 }
+
                 printf("%s",mm->msg);
                 list_multicast_one(l, n, mm);
                 message_free(mm);
@@ -474,9 +475,9 @@ int main(int argc, char** argv)
     //only for test
     info_base * info = new info_base;
     info->software_id = "chrome";
-    info->user = "user1";
-    info->pw = "passwordofuser1";
-    info->web = "http://www.baidu.com";
+    info->user = "ff";              //your id
+    info->pw = "pwpwpwppwpw";           //your password
+    info->web = "http://umji.sjtu.edu.cn";
     infos.push_back(info);
     //*******************************************
 

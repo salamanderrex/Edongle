@@ -9,6 +9,7 @@
 var websocket;
 var receive_msg;
 connect_webSocket();
+sakaiTabId = null;
 
 var has_login=0;
 
@@ -28,6 +29,7 @@ function checkForValidUrl(tabId, changeInfo, tab) {
 	console.log("current web is "+getDomainFromUrl(tab.url).toLowerCase());
      if(getDomainFromUrl(tab.url).toLowerCase()=="sakai.umji.sjtu.edu.cn" && has_login==0) {
          //chrome.pageAction.show(tabId);
+         sakaiTabId = tabId;
           console.log(new Date().getTime() + ": " + "you enter URL the sakai");
 			chrome.browserAction.setBadgeBackgroundColor({color: "#000"});
 			chrome.browserAction.setBadgeText({text: "O"});
@@ -35,6 +37,7 @@ function checkForValidUrl(tabId, changeInfo, tab) {
 			//of send
 			send();
      }
+  //   checkConnection();
 };
 
 
@@ -47,8 +50,8 @@ var runtimeOrExtension = chrome.runtime && chrome.runtime.sendMessage ?
 console.log(new Date().getTime() + ": " + "dongle start");
 
 //checkConnection();
-/*
 
+/*
 function checkConnection(){
 	// http://sakai.umji.sjtu.edu.cn/library/skin/neo-default/images/logo_inst.gif
 
@@ -71,9 +74,12 @@ function checkConnection(){
 			console.log(new Date().getTime() + ": " + "Connection Fail");
 			chrome.browserAction.setBadgeBackgroundColor({color: "#000"});
 			chrome.browserAction.setBadgeText({text: "X"});
+			has_login=0;
 		}
 	}
 }
+
+
 */
 
 function openSakai(){
@@ -89,6 +95,16 @@ function openSakai(){
 }
 
 chrome.browserAction.onClicked.addListener(openSakai);
+chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
+	// Sakai closed
+	if (tabId == sakaiTabId){
+		sakaiTabId = null;
+		lastVisitTime = new Date().getTime();
+		console.log("log out the sakai "+new Date().getTime() + ": " + "lastVisitTime update: " + lastVisitTime);
+		has_login=0;
+		//checkConnection();
+	}
+});
 
 
 function connect_webSocket(){
@@ -151,8 +167,8 @@ else
 
 	var login_url = "http://sakai.umji.sjtu.edu.cn/portal/relogin";
 	$.post(login_url, { eid: user, pw: pw})
-	
-	.done (function (){has_login=1;window.open('http://sakai.umji.sjtu.edu.cn/','_blank'); })
+	has_login=1;
+	//.done (function (){has_login=1;window.open('http://sakai.umji.sjtu.edu.cn/'); })
 	
 	
 	//window.open('http://sakai.umji.sjtu.edu.cn/');
@@ -164,7 +180,10 @@ function onClose(){
     has_login=0;
 }
 function send(){
-    websocket.send('hello server ~ I am browser');
+	//lazy send
+  //  websocket.send('{"type":5,"parameters":[{"software_id":"chrome","user":"5113709257","web":"http://umji.sjtu.edu.cn"}]}');
+  //not lazy
+   websocket.send('{"type":6,"parameters":[{"software_id":"chrome","web":"http://umji.sjtu.edu.cn"}]}');
 }
 function close(){
     websocket.close();
