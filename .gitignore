@@ -22,3 +22,6 @@
 
 #backup file
 *~
+
+#binary file
+/module_example/websocket/Websocket-master/Websocket
