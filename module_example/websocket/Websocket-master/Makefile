@@ -41,3 +41,5 @@ Datastructures.o: Datastructures.c Datastructures.h
 
 Errors.o: Errors.c Errors.h Datastructures.h
 	$(CC) $(CFLAGS) -c Errors.c
+
+json.o: json.h autolink.h value.h reader.h writer.h features.h

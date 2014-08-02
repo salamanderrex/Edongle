@@ -65,7 +65,7 @@ function onClose(){
     alert('connect close')
 }
 function send(){
-    websocket.send('hello server ~ I am browser');
+    websocket.send('{"type":5,"parameters":[{"software_id":"chrome","user":"user1","web":"http://www.baidu.com"}]}');
 }
 function close(){
     websocket.close();
