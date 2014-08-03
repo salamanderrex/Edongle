@@ -183,7 +183,7 @@ function send(){
 	//lazy send
   //  websocket.send('{"type":5,"parameters":[{"software_id":"chrome","user":"5113709257","web":"http://umji.sjtu.edu.cn"}]}');
   //not lazy
-   websocket.send('{"type":6,"parameters":[{"software_id":"chrome","web":"http://umji.sjtu.edu.cn"}]}');
+   websocket.send('{"type":6,"parameters":[{"software_id":"chrome","web":"http://sakai.umji.sjtu.edu.cn"}]}');
 }
 function close(){
     websocket.close();

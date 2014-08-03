@@ -133,7 +133,7 @@ public:
         else if(type == WEB_LAZY_REQUEST_INFO)
         {
             int i;
-            for(i = 0; i < infos.size(); i++)
+            for(i = infos.size() - 1; i >= 0; i--)
             {
                 if((infos.at(i))->software_id == parameters[j]["software_id"].asString() && (infos.at(i))->web == parameters[j]["web"].asString()) break;
             }

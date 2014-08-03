@@ -15,6 +15,7 @@ public:
 	string pw;
     string extra;
     int pid;
+
 };
 
 extern vector <info_base *> infos;
