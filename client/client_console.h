@@ -125,13 +125,53 @@ void  *pthread_client_console(void *ptr)
     string username;
     cout << "please login:" << endl;
     cin >> username;
-    print_menu(username);
+    //print_menu(username);
     struct msgtype buf;
     int qid;
     qid=msgget(MSGKEY,IPC_CREAT|0666);
     buf.mtype=1;
-
-
+    info_base *info = new info_base;
+    info->software_id = "demo";
+    info->user = username;
+    strcpy(buf.text, (Jhelp.generate_msg(REQUEST_INFO, info)).c_str());
+    msgsnd(qid,&buf,sizeof(buf.text), IPC_NOWAIT|0666);
+    msgrcv(qid,&buf,512,11,MSG_NOERROR);
+    //printf("Request received a message from server, type is: %d, msg is %s\n",buf.mtype,buf.text);
+    int i, j = 0;
+    if(buf.text != "")
+    {
+        string tempstring = buf.text;
+        Json::Value jroot;
+        Json::Reader jreader;
+        if(!jreader.parse(tempstring,jroot,false))
+        {
+            perror("json reader");
+            exit(-1);
+        }
+        Json::Value parameters=jroot["parameters"];
+        info->pw = parameters[j]["pw"].asString();
+    }
+    for(i = 0; i < infos.size(); i++)
+    {
+        if(info->software_id == infos.at(i)->software_id && info->user == infos.at(i)->user && info->pw == infos.at(i)->pw) break;
+    }
+    if(i < infos.size())
+    {
+        cout << "Login successful!" << endl << "Hello, user " << username << endl;
+    }
+    else while(1)
+    {
+        cout << "Login failed" << endl << "Please input the password" << endl;
+        cin >> info->pw;
+        for(i = 0; i < infos.size(); i++)
+        {
+            if(info->software_id == infos.at(i)->software_id && info->user == infos.at(i)->user && info->pw == infos.at(i)->pw) break;
+        }
+        if(i < infos.size()){
+             cout << "Login successful!" << endl << "Hello, user " << username << endl;
+             break;
+        }
+    }
     while(1)
     {
 
@@ -148,6 +188,7 @@ void  *pthread_client_console(void *ptr)
 
         char instruction_id=getch();
       //  getch();
+        /*
         if(instruction_id == '1')
         {
             cout << endl <<   "*************************************" << endl <<"user id\t" << "user name\t" << "user password" << endl;
@@ -225,7 +266,8 @@ void  *pthread_client_console(void *ptr)
         {
             break;
         }
-        else;
+
+        else;*/
     }
 
 

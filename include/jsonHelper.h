@@ -11,6 +11,8 @@ using namespace std;
 
 extern vector <info_base *> infos;
 
+info_base *error_info = new info_base;
+
 class jsonhelper
 {
 public:
@@ -103,9 +105,9 @@ public:
             int i;
             for(i = 0; i < infos.size(); i++)
             {
-                if((infos.at(i))->software_id == parameters[j]["software_id"].asString() && (infos.at(i))->pid == parameters[j]["pid"].asInt() && (infos.at(i))->user == parameters[j]["user"].asString()) break;
+                if((infos.at(i))->software_id == parameters[j]["software_id"].asString() && (infos.at(i))->user == parameters[j]["user"].asString()) break;
             }
-            if(i == infos.size()) return "fail";
+            if(i == infos.size()) return generate_msg(RESPONSE_INFO, error_info);
             else return generate_msg(RESPONSE_INFO, infos.at(i));
         }
         else if(type == REQUEST_STORE)
@@ -126,30 +128,53 @@ public:
             {
                 if((infos.at(i))->software_id == parameters[j]["software_id"].asString() && (infos.at(i))->web == parameters[j]["web"].asString() && (infos.at(i))->user == parameters[j]["user"].asString()) break;
             }
-            if(i == infos.size()) return "fail";
+            if(i == infos.size()) return generate_msg(WEB_RESPONSE_INFO, error_info);
             else return generate_msg(WEB_RESPONSE_INFO, infos.at(i));
         }
 
         else if(type == WEB_LAZY_REQUEST_INFO)
         {
+            info_base * info = new info_base;
+            infos.push_back(info);
+            info->software_id = parameters[j]["software_id"].asString();
+            info->web = parameters[j]["web"].asString();
+            info->flag = -2;
+            while(info->flag == -2)
+            {
+                //printf("%s","waiting for reading\n");
+                usleep(500*1000);
+            }
+
+            if(info->flag == -3)
+            {
+                infos.pop_back();
+                delete info;
+            }
             int i;
             for(i = infos.size() - 1; i >= 0; i--)
             {
                 if((infos.at(i))->software_id == parameters[j]["software_id"].asString() && (infos.at(i))->web == parameters[j]["web"].asString()) break;
             }
-            if(i == infos.size()) return "fail";
+            if(i == infos.size()) return generate_msg(WEB_RESPONSE_INFO, error_info);
             else return generate_msg(WEB_RESPONSE_INFO, infos.at(i));
         }
 
         else if(type == WEB_REQUEST_STORE)
         {
             info_base * info = new info_base;
+            infos.push_back(info);
             info->software_id = parameters[j]["software_id"].asString();
             info->user = parameters[j]["user"].asString();
             info->pw = parameters[j]["pw"].asString();
             info->web = parameters[j]["web"].asString();
+            //info->user_length = info->user.length();
+            info->flag = -1;
+            while(info->flag == -1)
+            {
+                printf("%s","waiting for saving\n");
+                usleep(1500*1000);
+            }
             info->extra = "1";
-            infos.push_back(info);
             return generate_msg(WEB_RESPONSE_STORE, info);
         }
 

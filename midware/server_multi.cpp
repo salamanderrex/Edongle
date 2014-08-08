@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-
+#include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/wait.h>
@@ -18,6 +18,8 @@
 #include "server_console.h"
 #include <fstream>
 #include "msgcom.h"
+#include "usb.h"
+#include "S-AES.h"
 #define MAXBUF 1024
 #define MAX_DATABUF 4096
 extern "C"
@@ -469,20 +471,56 @@ typedef struct CLIENT {
 **server for multi-client
 **PF_SETSIZE=1024
 ****************************/
+int operation = 0;
+FILE *source_file;
+FILE *dest_file;
+
+
 int main(int argc, char** argv)
 {
     //*******************************************
     //only for test
+
     info_base * info = new info_base;
     info->software_id = "chrome";
     info->user = "ff";              //your id
     info->pw = "pwpwpwppwpw";           //your password
     info->web = "http://umji.sjtu.edu.cn";
+    info->flag = 0;
     infos.push_back(info);
+
+    for(int i = 0; i < 5; i++)
+    {
+        info_base *info1 = new info_base;
+        char temp[50];
+        sprintf(temp, "%d", i);
+        string temp1 = temp;
+        info1->software_id = "demo";
+        info1->user = "zqu" + temp1;
+        info1->pw = "zqu" + temp1;
+        info1->flag = 0;
+        infos.push_back(info1);
+    }
     //*******************************************
 
-    pthread_t id, id1;
-    int ret, ret1;
+    if(argc == 4)
+        {
+            char c = *argv[3];
+            operation = c-48;
+            source_file = fopen(argv[1],"rb");
+            if(source_file == NULL)
+                cout<<"error opening source file"<<endl;
+            dest_file = fopen(argv[2],"wb");
+            if(dest_file == NULL)
+                cout<<"error creating destination file"<<endl;
+        }
+        else
+        {
+            operation = 0;
+        }
+
+    pthread_t id, id1,id_usb;
+    int ret, ret1,ret_usb;
     ret=pthread_create(&id,NULL,pthread_server_console,NULL);
     if(ret!=0){
     printf ("Create pthread error!\n");
@@ -490,6 +528,11 @@ int main(int argc, char** argv)
     }
     ret1=pthread_create(&id1,NULL,pthread_msgcom,NULL);
     if(ret1!=0){
+    printf ("Create pthread error!\n");
+    exit (1);
+    }
+    ret_usb=pthread_create(&id_usb,NULL,pthread_usb,NULL);
+    if(ret_usb!=0){
     printf ("Create pthread error!\n");
     exit (1);
     }
@@ -596,14 +639,15 @@ int main(int argc, char** argv)
         /**
          * Create commandline, such that we can do simple commands on the server.
          */
+        /*
         if ( (pthread_create(&pthread_id, &pthread_attr, cmdline, NULL)) < 0 ){
             server_error(strerror(errno), server_socket, l);
         }
-
+        */
         /**
          * Do not wait for the thread to terminate.
          */
-        pthread_detach(pthread_id);
+        //pthread_detach(pthread_id);
 
         while (1) {
             client_length = sizeof(client_addr);

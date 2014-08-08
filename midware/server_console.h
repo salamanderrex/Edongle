@@ -112,13 +112,14 @@ void print_menu(string username)
            "1. check current info list"<<endl<<
            "2. exit"<<endl<<
            "====================================="<<endl;
+    printf("> ");
+    fflush(stdout);
 }
 
 void  *pthread_server_console(void *ptr)
 {
-    string username;
-    cout << "please login:" << endl;
-    cin >> username;
+    string username = "server";
+
     print_menu(username);
 
     while(1)
@@ -133,8 +134,6 @@ void  *pthread_server_console(void *ptr)
         {
             /* do some work */
         }
-
-
         char instruction_id=getch();
       //  getch();
         if(instruction_id == '1')

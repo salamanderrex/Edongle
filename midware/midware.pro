@@ -11,7 +11,9 @@ HEADERS += \
     ../include/md5.h \
     ../include/utf8.h \
     ../include/sha1.h \
-    ../include/Datastructures.h
+    ../include/Datastructures.h \
+    usb.h \
+    ../include/S-AES.h
 
 SOURCES += \
     server_multi.cpp \
@@ -22,9 +24,11 @@ SOURCES += \
     ../include/Datastructures.c \
     ../include/md5.c \
     ../include/utf8.c \
-    ../include/sha1.c
+    ../include/sha1.c \
+    usb.cpp \
+    ../include/S-AES.c
 
-unix:!macx: LIBS += -L$$PWD/../lib/ -ljsonlib
+unix:!macx: LIBS += -L$$PWD/../lib/ -ljsoncpp
 
 INCLUDEPATH += $$PWD/../include
 DEPENDPATH += $$PWD/../include
