@@ -9,9 +9,9 @@ Dongle which enables user to do their own configurations.
 #Function
 ---------------------------------------------------
 Function:
-*1. A movable pocket device which can store the secret, classified or confidential, different kind of level info (base on s-AES encryption)
-*2. Provide interface and create secure bridge between user software 
-*3. Provide encryption and decryption service (parallel )
+* 1. A movable pocket device which can store the secret, classified or confidential, different kind of level info (base on s-AES encryption)
+* 2. Provide interface and create secure bridge between user software 
+* 3. Provide encryption and decryption service (parallel )
 
 # How to run midware
 -------------------------------------------------
@@ -60,11 +60,11 @@ input the info, click save, wait it stores info in PIC32 , then close
 
 #library and used open source project
 ------------------
-*salamanderrex/jtorrent
-*openssl/openssl
-*mortzdk/Websocket
-*jiaxiluo/sakai_plus
-*open-source-parsers/jsoncpp
-*SHA-1
+* salamanderrex/jtorrent
+* openssl/openssl
+* mortzdk/Websocket
+* jiaxiluo/sakai_plus
+* open-source-parsers/jsoncpp
+* SHA-1
 
 
